@@ -1,0 +1,155 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Wildberries API",
+    "version": "1.0.0",
+    "description": "API для управления продуктами и категориями"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local server"
+    }
+  ],
+  "tags": [
+    { "name": "Категории" },
+    { "name": "Продукты" }
+  ],
+  "paths": {
+    "/categories": {
+      "get": {
+        "summary": "Получить все категории",
+        "tags": ["Категории"],
+        "responses": { "200": { "description": "Список категорий" } }
+      },
+      "post": {
+        "summary": "Создать категорию",
+        "tags": ["Категории"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/Category" } }
+          }
+        },
+        "responses": { "201": { "description": "Категория создана" } }
+      }
+    },
+    "/categories/{id}": {
+      "get": {
+        "summary": "Получить категорию по ID",
+        "tags": ["Категории"],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": {
+          "200": { "description": "Категория" },
+          "404": { "description": "Категория не найдена" }
+        }
+      },
+      "put": {
+        "summary": "Обновить категорию",
+        "tags": ["Категории"],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Category" } } }
+        },
+        "responses": {
+          "200": { "description": "Категория обновлена" },
+          "404": { "description": "Категория не найдена" }
+        }
+      },
+      "delete": {
+        "summary": "Удалить категорию",
+        "tags": ["Категории"],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": {
+          "200": { "description": "Категория удалена" },
+          "404": { "description": "Категория не найдена" }
+        }
+      }
+    },
+    "/products": {
+      "get": {
+        "summary": "Получить все продукты",
+        "tags": ["Продукты"],
+        "responses": { "200": { "description": "Список продуктов" } }
+      },
+      "post": {
+        "summary": "Создать продукт",
+        "tags": ["Продукты"],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Product" } } }
+        },
+        "responses": { "201": { "description": "Продукт создан" } }
+      }
+    },
+    "/products/{id}": {
+      "get": {
+        "summary": "Получить продукт по ID",
+        "tags": ["Продукты"],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": {
+          "200": { "description": "Продукт" },
+          "404": { "description": "Товар не найден" }
+        }
+      },
+      "put": {
+        "summary": "Обновить продукт",
+        "tags": ["Продукты"],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Product" } } }
+        },
+        "responses": {
+          "200": { "description": "Продукт обновлён" },
+          "404": { "description": "Товар не найден" }
+        }
+      },
+      "delete": {
+        "summary": "Удалить продукт",
+        "tags": ["Продукты"],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": {
+          "200": { "description": "Продукт удалён" },
+          "404": { "description": "Товар не найден" }
+        }
+      }
+    },
+    "/products/category/{categoryId}": {
+      "get": {
+        "summary": "Получить продукты по категории",
+        "tags": ["Продукты"],
+        "parameters": [{ "name": "categoryId", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": {
+          "200": { "description": "Список продуктов по категории" },
+          "404": { "description": "Категория не найдена" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Category": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "parent_id": { "type": "integer" }
+        },
+        "required": ["name"]
+      },
+      "Product": {
+        "type": "object",
+        "properties": {
+          "category_id": { "type": "integer" },
+          "name": { "type": "string" },
+          "price": { "type": "number" },
+          "discount": { "type": "integer" },
+          "stock": { "type": "integer" },
+          "image_url": { "type": "string" }
+        },
+        "required": ["name", "price", "category_id"]
+      }
+    }
+  }
+}
