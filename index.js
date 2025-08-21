@@ -21,104 +21,105 @@ const db = new sqlite3.Database('./database.db');
 //////////////////////
 // Создание таблиц
 //////////////////////
+db.serialize(() => {
+  // Категории
+  db.run(`CREATE TABLE IF NOT EXISTS categories (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    parent_id INTEGER,
+    FOREIGN KEY(parent_id) REFERENCES categories(id)
+  )`);
 
-// Категории
-db.run(`CREATE TABLE IF NOT EXISTS categories (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT NOT NULL,
-  parent_id INTEGER,
-  FOREIGN KEY(parent_id) REFERENCES categories(id)
-)`);
+  // Бренды
+  db.run(`CREATE TABLE IF NOT EXISTS brands (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT UNIQUE NOT NULL
+  )`);
 
-// Бренды
-db.run(`CREATE TABLE IF NOT EXISTS brands (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT UNIQUE NOT NULL
-)`);
+  // Продавцы
+  db.run(`CREATE TABLE IF NOT EXISTS sellers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    store_name TEXT,
+    rating REAL DEFAULT 0
+  )`);
 
-// Продавцы
-db.run(`CREATE TABLE IF NOT EXISTS sellers (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT NOT NULL,
-  email TEXT UNIQUE NOT NULL,
-  password TEXT NOT NULL,
-  store_name TEXT,
-  rating REAL DEFAULT 0
-)`);
+  // Пользователи
+  db.run(`CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    address TEXT,
+    phone TEXT
+  )`);
 
-// Пользователи
-db.run(`CREATE TABLE IF NOT EXISTS users (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT NOT NULL,
-  email TEXT UNIQUE NOT NULL,
-  password TEXT NOT NULL,
-  address TEXT,
-  phone TEXT
-)`);
+  // Товары
+  db.run(`CREATE TABLE IF NOT EXISTS products (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    category_id INTEGER,
+    brand_id INTEGER,
+    seller_id INTEGER,
+    name TEXT NOT NULL,
+    price REAL NOT NULL,
+    discount INTEGER DEFAULT 0,
+    stock INTEGER DEFAULT 0,
+    image_url TEXT,
+    reviews INTEGER DEFAULT 0,
+    overallRating REAL DEFAULT 0,
+    colors TEXT, -- JSON: ["red","blue"]
+    sizes TEXT,  -- JSON: ["S","M","L"]
+    gender TEXT CHECK(gender IN ('Мужской', 'Женский', 'Детский')),
+    FOREIGN KEY(category_id) REFERENCES categories(id),
+    FOREIGN KEY(brand_id) REFERENCES brands(id),
+    FOREIGN KEY(seller_id) REFERENCES sellers(id)
+  )`);
 
-// Товары
-db.run(`CREATE TABLE IF NOT EXISTS products (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  category_id INTEGER,
-  brand_id INTEGER,
-  seller_id INTEGER,
-  name TEXT NOT NULL,
-  price REAL NOT NULL,
-  discount INTEGER DEFAULT 0,
-  stock INTEGER DEFAULT 0,
-  image_url TEXT,
-  reviews INTEGER DEFAULT 0,
-  overallRating REAL DEFAULT 0,
-  colors TEXT, -- JSON: ["red","blue"]
-  sizes TEXT,  -- JSON: ["S","M","L"]
-  gender TEXT CHECK(gender IN ('Мужской', 'Женский', 'Детский')),
-  FOREIGN KEY(category_id) REFERENCES categories(id),
-  FOREIGN KEY(brand_id) REFERENCES brands(id),
-  FOREIGN KEY(seller_id) REFERENCES sellers(id)
-)`);
+  // Отзывы
+  db.run(`CREATE TABLE IF NOT EXISTS reviews (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    product_id INTEGER,
+    rating INTEGER CHECK(rating >= 1 AND rating <= 5),
+    comment TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(user_id) REFERENCES users(id),
+    FOREIGN KEY(product_id) REFERENCES products(id)
+  )`);
 
-// Отзывы
-db.run(`CREATE TABLE IF NOT EXISTS reviews (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  user_id INTEGER,
-  product_id INTEGER,
-  rating INTEGER CHECK(rating >= 1 AND rating <= 5),
-  comment TEXT,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY(user_id) REFERENCES users(id),
-  FOREIGN KEY(product_id) REFERENCES products(id)
-)`);
+  // Корзина
+  db.run(`CREATE TABLE IF NOT EXISTS cart (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    product_id INTEGER,
+    quantity INTEGER DEFAULT 1,
+    FOREIGN KEY(user_id) REFERENCES users(id),
+    FOREIGN KEY(product_id) REFERENCES products(id)
+  )`);
 
-// Корзина
-db.run(`CREATE TABLE IF NOT EXISTS cart (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  user_id INTEGER,
-  product_id INTEGER,
-  quantity INTEGER DEFAULT 1,
-  FOREIGN KEY(user_id) REFERENCES users(id),
-  FOREIGN KEY(product_id) REFERENCES products(id)
-)`);
+  // Заказы
+  db.run(`CREATE TABLE IF NOT EXISTS orders (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    total REAL,
+    status TEXT DEFAULT 'pending',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(user_id) REFERENCES users(id)
+  )`);
 
-// Заказы
-db.run(`CREATE TABLE IF NOT EXISTS orders (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  user_id INTEGER,
-  total REAL,
-  status TEXT DEFAULT 'pending',
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY(user_id) REFERENCES users(id)
-)`);
-
-// Состав заказа
-db.run(`CREATE TABLE IF NOT EXISTS order_items (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  order_id INTEGER,
-  product_id INTEGER,
-  quantity INTEGER,
-  price REAL,
-  FOREIGN KEY(order_id) REFERENCES orders(id),
-  FOREIGN KEY(product_id) REFERENCES products(id)
-)`);
+  // Состав заказа
+  db.run(`CREATE TABLE IF NOT EXISTS order_items (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id INTEGER,
+    product_id INTEGER,
+    quantity INTEGER,
+    price REAL,
+    FOREIGN KEY(order_id) REFERENCES orders(id),
+    FOREIGN KEY(product_id) REFERENCES products(id)
+  )`);
+});
 
 //////////////////////
 // ROUTES
@@ -140,7 +141,7 @@ app.get('/brands', (req, res) => {
   });
 });
 
-// Товары + фильтры (как WB)
+// Товары + фильтры
 app.get('/products', (req, res) => {
   let query = `SELECT p.*, b.name AS brand_name, c.name AS category_name
                FROM products p
@@ -149,7 +150,6 @@ app.get('/products', (req, res) => {
                WHERE 1=1`;
   let params = [];
 
-  // фильтры
   if (req.query.category_id) {
     query += ` AND p.category_id = ?`;
     params.push(req.query.category_id);
@@ -171,7 +171,6 @@ app.get('/products', (req, res) => {
     params.push(req.query.gender);
   }
 
-  // сортировка
   if (req.query.sort === 'price_asc') {
     query += ` ORDER BY p.price ASC`;
   } else if (req.query.sort === 'price_desc') {
@@ -214,7 +213,6 @@ app.post('/products', (req, res) => {
 //////////////////////
 // Базовые данные
 //////////////////////
-
 const baseCategories = [
   "Одежда", "Обувь", "Электроника", "Книги", "Дом и интерьер",
   "Красота и здоровье", "Спорт и отдых"
@@ -231,7 +229,6 @@ baseBrands.forEach(name => {
 //////////////////////
 // Запуск сервера
 //////////////////////
-
 app.listen(PORT, () => {
   console.log(`🚀 Сервер запущен: http://localhost:${PORT}`);
   console.log(`📖 Swagger: http://localhost:${PORT}/api-docs`);
