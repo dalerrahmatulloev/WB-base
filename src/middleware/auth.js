@@ -3,15 +3,26 @@ import { users } from "../db.js";
 
 export function authRequired(req, res, next) {
   const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json({ error: "No token" });
+  if (!authHeader) {
+    return res.status(401).json({ error: "No token provided" });
+  }
 
-  const token = authHeader.split(" ")[1];
+  const [scheme, token] = authHeader.split(" ");
+  if (scheme !== "Bearer" || !token) {
+    return res.status(401).json({ error: "Invalid auth header format" });
+  }
+
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || "secret");
-    req.user = users.find(u => u.id === decoded.id);
-    if (!req.user) return res.status(401).json({ error: "User not found" });
+    const user = users.find(u => u.id === decoded.id);
+    if (!user) {
+      return res.status(401).json({ error: "User not found" });
+    }
+
+    req.user = user;
     next();
-  } catch {
+  } catch (err) {
+    console.error("JWT error:", err.message);
     return res.status(401).json({ error: "Invalid token" });
   }
 }

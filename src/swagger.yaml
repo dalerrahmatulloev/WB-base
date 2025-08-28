@@ -5,6 +5,7 @@ info:
   description: API для практики фронтенда с mock-данными и пользовательскими действиями
 
 servers:
+  - url: https://wb-base.onrender.com
   - url: http://localhost:10000
     description: Локальный сервер
 
