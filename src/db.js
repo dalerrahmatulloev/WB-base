@@ -9,8 +9,7 @@ export let products = [
     stock_quantity: 50,
     sizes: ["S", "M", "L"],
     images: [
-      "https://via.placeholder.com/150/FF0000/FFFFFF?text=Red+Tshirt",
-      "https://via.placeholder.com/150/FF6666/FFFFFF?text=Red+Tshirt"
+      "https://sizcentr.ru/upload/iblock/499/499a004dc9e0a870033df579f8f5b688.png",
     ],
     stars: 4.5
   },
@@ -23,7 +22,8 @@ export let products = [
     stock_quantity: 30,
     sizes: ["M", "L", "XL"],
     images: [
-      "https://via.placeholder.com/150/0000FF/FFFFFF?text=Blue+Jeans"
+      "https://cdn-sh1.vigbo.com/shops/3903/products/22445701/images/3-b1340da8fd82d77620107c308a4b9b5a.jpg",
+      "https://cdn-sh1.vigbo.com/shops/3903/products/22445701/images/3-cc2d56573fe99a1db62d0bf3db991f8c.jpg"
     ],
     stars: 4.0
   },
@@ -36,7 +36,11 @@ export let products = [
     stock_quantity: 20,
     sizes: ["40", "41", "42", "43"],
     images: [
-      "https://via.placeholder.com/150/FFFFFF/000000?text=White+Sneakers"
+      "https://kotofey.ru/images/cms/thumbs/2ae37496c9f0a5a59178026a00b75c71f4c80a02/ef201e699db011ee8c18ac1f6bd8bc11_ef201efa9db011ee8c18ac1f6bd8bc11_556_555_jpg_5_80.jpg",
+      "https://kotofey.ru/images/cms/thumbs/2ae37496c9f0a5a59178026a00b75c71f4c80a02/ef201e699db011ee8c18ac1f6bd8bc11_ef201efa9db011ee8c18ac1f6bd8bc11_263_263_jpg_5_80.jpg",
+      "https://kotofey.ru/images/cms/thumbs/2ae37496c9f0a5a59178026a00b75c71f4c80a02/ef201e699db011ee8c18ac1f6bd8bc11_ef201f319db011ee8c18ac1f6bd8bc11_263_263_jpg_5_80.jpg",
+      "https://kotofey.ru/images/cms/thumbs/2ae37496c9f0a5a59178026a00b75c71f4c80a02/ef201e699db011ee8c18ac1f6bd8bc11_ef201f689db011ee8c18ac1f6bd8bc11_263_263_jpg_5_80.jpg",
+      "https://kotofey.ru/images/cms/thumbs/2ae37496c9f0a5a59178026a00b75c71f4c80a02/ef201e699db011ee8c18ac1f6bd8bc11_ef201f9f9db011ee8c18ac1f6bd8bc11_263_263_jpg_5_80.jpg"
     ],
     stars: 4.7
   },
@@ -49,7 +53,8 @@ export let products = [
     stock_quantity: 15,
     sizes: ["M", "L", "XL"],
     images: [
-      "https://via.placeholder.com/150/000000/FFFFFF?text=Black+Jacket"
+      "https://charisma.ua/image/cache/catalog/S2237%202XX%2099/IMG_3278%20copy-1100x1400.jpg",
+      "https://charisma.ua/image/cache/catalog/S2237%202XX%2099/IMG_3273%20copy-1100x1400.jpg"
     ],
     stars: 4.8
   }
