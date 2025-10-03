@@ -6,7 +6,10 @@ const router = Router();
 const productsRouter = Router();
 
 // GET /api/catalog/products
-productsRouter.get("/", (req, res) => res.json(products));
+productsRouter.get("/", (req, res) => {
+  console.log("Все продукты:", products);
+  res.json(products);
+});
 
 // GET /api/catalog/products/:id
 productsRouter.get("/:id", (req, res) => {
