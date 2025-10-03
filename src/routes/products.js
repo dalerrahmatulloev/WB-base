@@ -10,6 +10,8 @@ productsRouter.get("/", (req, res) => res.json(products));
 
 // GET /api/catalog/products/:id
 productsRouter.get("/:id", (req, res) => {
+  console.log("Все продукты:", products);
+  console.log("Ищем ID:", req.params.id);
   const product = products.find((p) => p.id == req.params.id);
   if (!product) return res.status(404).json({ error: "Not found" });
   res.json(product);
@@ -17,6 +19,7 @@ productsRouter.get("/:id", (req, res) => {
 
 // POST /api/catalog/products
 productsRouter.post("/", authRequired, (req, res) => {
+  console.log("🔥 POST /products", req.body);
   const product = { id: products.length + 1, ...req.body };
   products.push(product);
   res.status(201).json(product);
